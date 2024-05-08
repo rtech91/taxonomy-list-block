@@ -8,6 +8,20 @@
 	"icon": "smiley",
 	"description": "Example block scaffolded with Create Block tool.",
 	"example": {},
+    "attributes": {
+      "selectedTaxonomy": {
+        "type": "string",
+        "default": "category"
+      },
+      "outputVariant": {
+        "type": "string",
+        "default": "list"
+      },
+      "includeLinks": {
+        "type": "boolean",
+        "default": true
+      }
+    },
 	"supports": {
 		"html": false
 	},
