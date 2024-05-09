@@ -20,6 +20,14 @@
       "includeLinks": {
         "type": "boolean",
         "default": true
+      },
+      "includeImage": {
+        "type": "boolean",
+        "default": false
+      },
+      "imageFieldName": {
+        "type": "string",
+        "default": ""
       }
     },
 	"supports": {

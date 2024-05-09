@@ -3,6 +3,8 @@
 	$selectedTaxonomy = $attributes['selectedTaxonomy'];
 	$outputVariant = $attributes['outputVariant'];
 	$includeLinks = $attributes['includeLinks'];
+	$includeImage = $attributes['includeImage'];
+	$imageFieldName = $attributes['imageFieldName'];
 
 	// Get terms of the selected taxonomy
 	$terms = get_terms( array(
@@ -27,6 +29,15 @@
 				echo '<li>';
 			} else {
 				echo '<div class="flex-item">';
+			}
+
+			if ($includeImage) {
+				$image = get_term_meta($term->term_id, $imageFieldName, true);
+				if ($image && is_numeric( $image)) {
+                    echo wp_get_attachment_image($image, 'thumbnail');
+				} else if( $image ) {
+					echo '<img src="' . esc_url($image) . '" alt="' . esc_attr($term->name) . '">';
+				}
 			}
 
 			if ($includeLinks) {

@@ -18,43 +18,142 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_i18n__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @wordpress/block-editor */ "@wordpress/block-editor");
 /* harmony import */ var _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./editor.scss */ "./src/editor.scss");
-
-/**
- * Retrieves the translation of text.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/
- */
-
-
-/**
- * React hook that is used to mark the block wrapper element.
- * It provides all the necessary props like the class name.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
- */
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./editor.scss */ "./src/editor.scss");
 
 
-/**
- * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
- * Those files can contain any CSS code that gets applied to the editor.
- *
- * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
- */
 
 
-/**
- * The edit function describes the structure of your block in the context of the
- * editor. This represents what the editor will render when the block is used.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit
- *
- * @return {Element} Element to render.
- */
-function Edit() {
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+
+
+
+function Edit({
+  attributes,
+  setAttributes
+}) {
+  const {
+    selectedTaxonomy,
+    outputVariant,
+    includeLinks,
+    includeImage,
+    imageFieldName
+  } = attributes;
+  const {
+    editPost
+  } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_4__.useDispatch)('core/editor');
+  const [taxonomies, setTaxonomies] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useState)([]);
+  const [terms, setTerms] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useState)([]);
+
+  // Fetch taxonomies
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useEffect)(() => {
+    wp.apiFetch({
+      path: '/wp/v2/taxonomies'
+    }).then(data => {
+      setTaxonomies(data);
+    });
+  }, []);
+
+  // Fetch terms when selectedTaxonomy changes
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useEffect)(() => {
+    if (selectedTaxonomy) {
+      wp.apiFetch({
+        path: `/wp/v2/${selectedTaxonomy}`
+      }).then(data => {
+        setTerms(data);
+      });
+    }
+  }, [selectedTaxonomy]);
+  const taxonomyOptions = Object.keys(taxonomies).map(key => {
+    return {
+      value: key,
+      label: taxonomies[key].name
+    };
+  });
+  const outputVariantOptions = [{
+    value: 'list',
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('List', 'taxonomy-list-block')
+  }, {
+    value: 'flex',
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Flex Blocks', 'taxonomy-list-block')
+  }];
+  const renderTerms = () => {
+    if (outputVariant === 'list') {
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("ul", null, terms.map(term => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("li", {
+        key: term.id
+      }, includeLinks ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
+        href: term.link
+      }, term.name) : term.name)));
+    } else {
+      return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+        className: "flex-container"
+      }, terms.map(term => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+        key: term.id,
+        className: "flex-item"
+      }, includeImage && term[imageFieldName] && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("img", {
+        src: term[imageFieldName],
+        alt: term.name
+      }), includeLinks ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
+        href: term.link
+      }, term.name) : term.name)));
+    }
+  };
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     ...(0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)()
-  }, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Taxonomy List Block – hello from the editor!', 'taxonomy-list-block'));
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelBody, {
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Taxonomy Settings', 'taxonomy-list-block')
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.SelectControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Select a taxonomy', 'taxonomy-list-block'),
+    value: selectedTaxonomy,
+    options: taxonomyOptions,
+    onChange: value => {
+      setAttributes({
+        selectedTaxonomy: value
+      });
+      editPost({
+        meta: {
+          _selectedTaxonomy: value
+        }
+      });
+    }
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.SelectControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Output Variant', 'taxonomy-list-block'),
+    value: outputVariant,
+    options: outputVariantOptions,
+    onChange: value => {
+      setAttributes({
+        outputVariant: value
+      });
+    }
+  }), outputVariant === 'flex' && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.ToggleControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Include Image', 'taxonomy-list-block'),
+    checked: includeImage,
+    onChange: value => {
+      setAttributes({
+        includeImage: value
+      });
+    }
+  }), includeImage && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.TextControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Image Field Name', 'taxonomy-list-block'),
+    value: imageFieldName,
+    onChange: value => {
+      setAttributes({
+        imageFieldName: value
+      });
+    }
+  })), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.ToggleControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Include Links', 'taxonomy-list-block'),
+    checked: includeLinks,
+    onChange: value => {
+      setAttributes({
+        includeLinks: value
+      });
+    }
+  }))), renderTerms());
 }
 
 /***/ }),
@@ -161,6 +260,36 @@ module.exports = window["wp"]["blocks"];
 
 /***/ }),
 
+/***/ "@wordpress/components":
+/*!************************************!*\
+  !*** external ["wp","components"] ***!
+  \************************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["components"];
+
+/***/ }),
+
+/***/ "@wordpress/data":
+/*!******************************!*\
+  !*** external ["wp","data"] ***!
+  \******************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["data"];
+
+/***/ }),
+
+/***/ "@wordpress/element":
+/*!*********************************!*\
+  !*** external ["wp","element"] ***!
+  \*********************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["element"];
+
+/***/ }),
+
 /***/ "@wordpress/i18n":
 /*!******************************!*\
   !*** external ["wp","i18n"] ***!
@@ -177,7 +306,7 @@ module.exports = window["wp"]["i18n"];
   \************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/taxonomy-list-block","version":"0.1.0","title":"Taxonomy List Block","category":"widgets","icon":"smiley","description":"Example block scaffolded with Create Block tool.","example":{},"supports":{"html":false},"textdomain":"taxonomy-list-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScript":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/taxonomy-list-block","version":"0.1.0","title":"Taxonomy List Block","category":"widgets","icon":"smiley","description":"Example block scaffolded with Create Block tool.","example":{},"attributes":{"selectedTaxonomy":{"type":"string","default":"category"},"outputVariant":{"type":"string","default":"list"},"includeLinks":{"type":"boolean","default":true},"includeImage":{"type":"boolean","default":false},"imageFieldName":{"type":"string","default":""}},"supports":{"html":false},"textdomain":"taxonomy-list-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScript":"file:./view.js"}');
 
 /***/ })
 
