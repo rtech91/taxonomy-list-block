@@ -49,69 +49,67 @@ export default function Edit( { attributes, setAttributes } ) {
             );
         } else {
             return (
-                <div className="flex-container">
-                    { terms.map( ( term ) => (
-                        <div key={ term.id } className="flex-item">
-                            { includeImage && term[imageFieldName] && <img src={ term[imageFieldName] } alt={ term.name } /> }
-                            { includeLinks ? <a href={ term.link }>{ term.name }</a> : term.name }
-                        </div>
-                    ) ) }
-                </div>
+                terms.map( ( term ) => (
+                    <div key={ term.id } className="flex-item">
+                        { includeImage && term[imageFieldName] && <img src={ term[imageFieldName] } alt={ term.name } /> }
+                        { includeLinks ? <a href={ term.link }>{ term.name }</a> : term.name }
+                    </div>
+                ) )
             );
         }
     };
 
     return (
-        <div { ...useBlockProps() }>
+        <div {...useBlockProps({style: outputVariant === 'flex' ? {display: 'flex'} : {}})}>
             <InspectorControls>
-                <PanelBody title={ __( 'Taxonomy Settings', 'taxonomy-list-block' ) }>
+                <PanelBody title={__('Taxonomy Settings', 'taxonomy-list-block')}>
                     <SelectControl
-                        label={ __( 'Select a taxonomy', 'taxonomy-list-block' ) }
-                        value={ selectedTaxonomy }
-                        options={ taxonomyOptions }
-                        onChange={ ( value ) => {
-                            setAttributes( { selectedTaxonomy: value } );
-                            editPost( { meta: { _selectedTaxonomy: value } } );
-                        } }
+                        label={__('Select a taxonomy', 'taxonomy-list-block')}
+                        value={selectedTaxonomy}
+                        options={taxonomyOptions}
+                        onChange={(value) => {
+                            setAttributes({selectedTaxonomy: value});
+                            editPost({meta: {_selectedTaxonomy: value}});
+                        }}
                     />
                     <SelectControl
-                        label={ __( 'Output Variant', 'taxonomy-list-block' ) }
-                        value={ outputVariant }
-                        options={ outputVariantOptions }
-                        onChange={ ( value ) => {
-                            setAttributes( { outputVariant: value } );
-                        } }
+                        label={__('Output Variant', 'taxonomy-list-block')}
+                        value={outputVariant}
+                        options={outputVariantOptions}
+                        onChange={(value) => {
+                            setAttributes({outputVariant: value});
+                        }}
                     />
-                    { outputVariant === 'flex' && (
+                    {outputVariant === 'flex' && (
                         <>
                             <ToggleControl
-                                label={ __( 'Include Image', 'taxonomy-list-block' ) }
-                                checked={ includeImage }
-                                onChange={ ( value ) => {
-                                    setAttributes( { includeImage: value } );
-                                } }
+                                label={__('Include Image', 'taxonomy-list-block')}
+                                checked={includeImage}
+                                onChange={(value) => {
+                                    setAttributes({includeImage: value});
+                                }}
                             />
-                            { includeImage && (
+                            {includeImage && (
                                 <TextControl
-                                    label={ __( 'Image Field Name', 'taxonomy-list-block' ) }
-                                    value={ imageFieldName }
-                                    onChange={ ( value ) => {
-                                        setAttributes( { imageFieldName: value } );
-                                    } }
+                                    label={__('Image Field Name', 'taxonomy-list-block')}
+                                    value={imageFieldName}
+                                    onChange={(value) => {
+                                        setAttributes({imageFieldName: value});
+                                    }}
                                 />
-                            ) }
+                            )}
                         </>
-                    ) }
+                    )}
                     <ToggleControl
-                        label={ __( 'Include Links', 'taxonomy-list-block' ) }
-                        checked={ includeLinks }
-                        onChange={ ( value ) => {
-                            setAttributes( { includeLinks: value } );
-                        } }
+                        label={__('Include Links', 'taxonomy-list-block')}
+                        checked={includeLinks}
+                        onChange={(value) => {
+                            setAttributes({includeLinks: value});
+                        }}
                     />
                 </PanelBody>
             </InspectorControls>
-            { renderTerms() }
+            {renderTerms()}
         </div>
     );
 }
