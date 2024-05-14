@@ -5,7 +5,7 @@
 	"version": "0.1.0",
 	"title": "Taxonomy List Block",
 	"category": "widgets",
-	"icon": "smiley",
+	"icon": "tag",
 	"description": "Example block scaffolded with Create Block tool.",
 	"example": {},
     "attributes": {
