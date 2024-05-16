@@ -87,11 +87,19 @@ function Edit({
   }, [selectedTaxonomy]);
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useEffect)(() => {
     if (selectedTaxonomy) {
-      wp.apiFetch({
-        path: `/wp/v2/${selectedTaxonomy}?parent=${parentTermId}`
-      }).then(data => {
-        setTerms(data);
-      });
+      if (parentTermId === -1) {
+        wp.apiFetch({
+          path: `/wp/v2/${selectedTaxonomy}?slug=${window.location.pathname.split('/').pop()}`
+        }).then(data => {
+          setTerms(data);
+        });
+      } else {
+        wp.apiFetch({
+          path: `/wp/v2/${selectedTaxonomy}?parent=${parentTermId}`
+        }).then(data => {
+          setTerms(data);
+        });
+      }
     }
   }, [selectedTaxonomy, parentTermId]);
   const generateTermOptions = (terms, depth = 0) => {
@@ -167,6 +175,9 @@ function Edit({
     options: [{
       value: 0,
       label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('All', 'taxonomy-list-block')
+    }, {
+      value: -1,
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Use context', 'taxonomy-list-block')
     }, ...generateTermOptions(parentTerms)],
     onChange: value => {
       setAttributes({

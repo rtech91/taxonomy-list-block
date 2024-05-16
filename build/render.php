@@ -1,13 +1,19 @@
 <?php
 $selectedTaxonomy = $attributes['selectedTaxonomy'];
-$outputVariant = $attributes['outputVariant'];
-$includeLinks = $attributes['includeLinks'];
-$includeImage = $attributes['includeImage'];
-$imageFieldName = $attributes['imageFieldName'];
-$setAsBackground = $attributes['setAsBackground'];
-$parentTermId = $attributes['parentTermId'];
+$outputVariant    = $attributes['outputVariant'];
+$includeLinks     = $attributes['includeLinks'];
+$includeImage     = $attributes['includeImage'];
+$imageFieldName   = $attributes['imageFieldName'];
+$setAsBackground  = $attributes['setAsBackground'];
+$parentTermId     = $attributes['parentTermId'];
 
 // Get terms of the selected taxonomy
+if ($parentTermId === -1) {
+	$current_url = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http' ) . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+	$term_slug   = basename( rtrim( $current_url, '/' ) );
+	$term = get_term_by('slug', $term_slug, $selectedTaxonomy);
+	$parentTermId = $term ? $term->term_id : 0;
+}
 $terms = get_terms(array(
 	'taxonomy' => $selectedTaxonomy,
 	'parent' => $parentTermId,

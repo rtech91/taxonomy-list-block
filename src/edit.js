@@ -37,9 +37,15 @@ export default function Edit( { attributes, setAttributes } ) {
 
     useEffect( () => {
         if ( selectedTaxonomy ) {
-            wp.apiFetch( { path: `/wp/v2/${ selectedTaxonomy }?parent=${parentTermId}` } ).then( ( data ) => {
-                setTerms( data );
-            } );
+            if (parentTermId === -1) {
+                wp.apiFetch( { path: `/wp/v2/${ selectedTaxonomy }?slug=${window.location.pathname.split('/').pop()}` } ).then( ( data ) => {
+                    setTerms( data );
+                } );
+            } else {
+                wp.apiFetch( { path: `/wp/v2/${ selectedTaxonomy }?parent=${parentTermId}` } ).then( ( data ) => {
+                    setTerms( data );
+                } );
+            }
         }
     }, [ selectedTaxonomy, parentTermId ] );
 
@@ -105,7 +111,11 @@ export default function Edit( { attributes, setAttributes } ) {
                     <SelectControl
                         label={__('Select a parent term', 'taxonomy-list-block')}
                         value={parentTermId}
-                        options={[ { value: 0, label: __('All', 'taxonomy-list-block') }, ...generateTermOptions(parentTerms) ]}
+                        options={[
+                            { value: 0, label: __('All', 'taxonomy-list-block') },
+                            { value: -1, label: __('Use context', 'taxonomy-list-block') },
+                            ...generateTermOptions(parentTerms)
+                        ]}
                         onChange={(value) => {
                             setAttributes({parentTermId: parseInt(value, 10)});
                         }}
