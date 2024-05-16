@@ -60,14 +60,28 @@ function Edit({
       setTaxonomies(data);
     });
   }, []);
+  const transformToHierarchical = (arr, parent = 0, tree = []) => {
+    arr.filter(({
+      parent: id
+    }) => id === parent).forEach(({
+      id,
+      ...rest
+    }) => tree.push({
+      id,
+      ...rest,
+      children: transformToHierarchical(arr, id)
+    }));
+    return tree;
+  };
 
   // Fetch terms when selectedTaxonomy changes
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useEffect)(() => {
     if (selectedTaxonomy) {
       wp.apiFetch({
-        path: `/wp/v2/${selectedTaxonomy}?parent=0`
+        path: `/wp/v2/${selectedTaxonomy}`
       }).then(data => {
-        setParentTerms(data);
+        const hierarchicalData = transformToHierarchical(data);
+        setParentTerms(hierarchicalData);
       });
     }
   }, [selectedTaxonomy]);
@@ -80,6 +94,19 @@ function Edit({
       });
     }
   }, [selectedTaxonomy, parentTermId]);
+  const generateTermOptions = (terms, depth = 0) => {
+    let options = [];
+    terms.forEach(term => {
+      options.push({
+        value: term.id,
+        label: '- '.repeat(depth) + term.name
+      });
+      if (term.children) {
+        options = options.concat(generateTermOptions(term.children, depth + 1));
+      }
+    });
+    return options;
+  };
   const taxonomyOptions = Object.keys(taxonomies).map(key => {
     return {
       value: key,
@@ -140,10 +167,7 @@ function Edit({
     options: [{
       value: 0,
       label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('All', 'taxonomy-list-block')
-    }, ...parentTerms.map(term => ({
-      value: term.id,
-      label: term.name
-    }))],
+    }, ...generateTermOptions(parentTerms)],
     onChange: value => {
       setAttributes({
         parentTermId: parseInt(value, 10)
