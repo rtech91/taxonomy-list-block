@@ -6,10 +6,11 @@ import { useEffect, useState } from '@wordpress/element';
 import './editor.scss';
 
 export default function Edit( { attributes, setAttributes } ) {
-    const { selectedTaxonomy, outputVariant, includeLinks, includeImage, imageFieldName, setAsBackground } = attributes;
+    const { selectedTaxonomy, outputVariant, includeLinks, includeImage, imageFieldName, setAsBackground, parentTermId } = attributes;
     const { editPost } = useDispatch( 'core/editor' );
     const [ taxonomies, setTaxonomies ] = useState( [] );
     const [ terms, setTerms ] = useState( [] );
+    const [ parentTerms, setParentTerms ] = useState( [] );
 
     // Fetch taxonomies
     useEffect( () => {
@@ -21,11 +22,19 @@ export default function Edit( { attributes, setAttributes } ) {
     // Fetch terms when selectedTaxonomy changes
     useEffect( () => {
         if ( selectedTaxonomy ) {
-            wp.apiFetch( { path: `/wp/v2/${ selectedTaxonomy }` } ).then( ( data ) => {
-                setTerms( data );
+            wp.apiFetch( { path: `/wp/v2/${ selectedTaxonomy }?parent=0` } ).then( ( data ) => {
+                setParentTerms( data );
             } );
         }
     }, [ selectedTaxonomy ] );
+
+    useEffect( () => {
+        if ( selectedTaxonomy ) {
+            wp.apiFetch( { path: `/wp/v2/${ selectedTaxonomy }?parent=${parentTermId}` } ).then( ( data ) => {
+                setTerms( data );
+            } );
+        }
+    }, [ selectedTaxonomy, parentTermId ] );
 
     const taxonomyOptions = Object.keys( taxonomies ).map( ( key ) => {
         return { value: key, label: taxonomies[ key ].name };
@@ -70,6 +79,14 @@ export default function Edit( { attributes, setAttributes } ) {
                         onChange={(value) => {
                             setAttributes({selectedTaxonomy: value});
                             editPost({meta: {_selectedTaxonomy: value}});
+                        }}
+                    />
+                    <SelectControl
+                        label={__('Select a parent term', 'taxonomy-list-block')}
+                        value={parentTermId}
+                        options={[ { value: 0, label: __('All', 'taxonomy-list-block') }, ...parentTerms.map((term) => ({ value: term.id, label: term.name })) ]}
+                        onChange={(value) => {
+                            setAttributes({parentTermId: parseInt(value, 10)});
                         }}
                     />
                     <SelectControl

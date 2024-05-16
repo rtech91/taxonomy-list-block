@@ -42,13 +42,15 @@ function Edit({
     includeLinks,
     includeImage,
     imageFieldName,
-    setAsBackground
+    setAsBackground,
+    parentTermId
   } = attributes;
   const {
     editPost
   } = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_4__.useDispatch)('core/editor');
   const [taxonomies, setTaxonomies] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useState)([]);
   const [terms, setTerms] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useState)([]);
+  const [parentTerms, setParentTerms] = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useState)([]);
 
   // Fetch taxonomies
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useEffect)(() => {
@@ -63,12 +65,21 @@ function Edit({
   (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useEffect)(() => {
     if (selectedTaxonomy) {
       wp.apiFetch({
-        path: `/wp/v2/${selectedTaxonomy}`
+        path: `/wp/v2/${selectedTaxonomy}?parent=0`
+      }).then(data => {
+        setParentTerms(data);
+      });
+    }
+  }, [selectedTaxonomy]);
+  (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_5__.useEffect)(() => {
+    if (selectedTaxonomy) {
+      wp.apiFetch({
+        path: `/wp/v2/${selectedTaxonomy}?parent=${parentTermId}`
       }).then(data => {
         setTerms(data);
       });
     }
-  }, [selectedTaxonomy]);
+  }, [selectedTaxonomy, parentTermId]);
   const taxonomyOptions = Object.keys(taxonomies).map(key => {
     return {
       value: key,
@@ -121,6 +132,21 @@ function Edit({
         meta: {
           _selectedTaxonomy: value
         }
+      });
+    }
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.SelectControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Select a parent term', 'taxonomy-list-block'),
+    value: parentTermId,
+    options: [{
+      value: 0,
+      label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('All', 'taxonomy-list-block')
+    }, ...parentTerms.map(term => ({
+      value: term.id,
+      label: term.name
+    }))],
+    onChange: value => {
+      setAttributes({
+        parentTermId: parseInt(value, 10)
       });
     }
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.SelectControl, {
@@ -317,7 +343,7 @@ module.exports = window["wp"]["i18n"];
   \************************/
 /***/ ((module) => {
 
-module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/taxonomy-list-block","version":"0.1.0","title":"Taxonomy List Block","category":"widgets","icon":"tag","description":"Example block scaffolded with Create Block tool.","example":{},"attributes":{"selectedTaxonomy":{"type":"string","default":"category"},"outputVariant":{"type":"string","default":"list"},"includeLinks":{"type":"boolean","default":true},"includeImage":{"type":"boolean","default":false},"imageFieldName":{"type":"string","default":""},"setAsBackground":{"type":"boolean","default":false}},"supports":{"html":false,"color":{"text":true,"background":true,"link":true},"spacing":{"padding":true,"margin":true,"blockGap":["horizontal","vertical"]},"typography":{"fontSize":true,"lineHeight":true},"align":true,"customClassName":true,"anchor":true,"inserter":true,"reusable":true,"alignWide":true,"layout":{"default":{"type":"flex","justifyContent":"center"},"allowEditing":true,"allowInheriting":true,"allowSizingOnChildren":true,"allowVerticalAlignment":true,"allowJustification":true,"allowOrientation":true,"allowCustomContentAndWideSize":true}},"textdomain":"taxonomy-list-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScript":"file:./view.js"}');
+module.exports = /*#__PURE__*/JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":3,"name":"create-block/taxonomy-list-block","version":"0.1.0","title":"Taxonomy List Block","category":"widgets","icon":"tag","description":"Example block scaffolded with Create Block tool.","example":{},"attributes":{"selectedTaxonomy":{"type":"string","default":"category"},"parentTermId":{"type":"number","default":0},"outputVariant":{"type":"string","default":"list"},"includeLinks":{"type":"boolean","default":true},"includeImage":{"type":"boolean","default":false},"imageFieldName":{"type":"string","default":""},"setAsBackground":{"type":"boolean","default":false}},"supports":{"html":false,"color":{"text":true,"background":true,"link":true},"spacing":{"padding":true,"margin":true,"blockGap":["horizontal","vertical"]},"typography":{"fontSize":true,"lineHeight":true},"align":true,"customClassName":true,"anchor":true,"inserter":true,"reusable":true,"alignWide":true,"layout":{"default":{"type":"flex","justifyContent":"center"},"allowEditing":true,"allowInheriting":true,"allowSizingOnChildren":true,"allowVerticalAlignment":true,"allowJustification":true,"allowOrientation":true,"allowCustomContentAndWideSize":true}},"textdomain":"taxonomy-list-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","render":"file:./render.php","viewScript":"file:./view.js"}');
 
 /***/ })
 
