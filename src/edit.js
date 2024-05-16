@@ -6,7 +6,7 @@ import { useEffect, useState } from '@wordpress/element';
 import './editor.scss';
 
 export default function Edit( { attributes, setAttributes } ) {
-    const { selectedTaxonomy, outputVariant, includeLinks, includeImage, imageFieldName, setAsBackground, parentTermId } = attributes;
+    const { selectedTaxonomy, outputVariant, includeLinks, includeImage, imageFieldName, setAsBackground, parentTermId, contextTermId } = attributes;
     const { editPost } = useDispatch( 'core/editor' );
     const [ taxonomies, setTaxonomies ] = useState( [] );
     const [ terms, setTerms ] = useState( [] );
@@ -38,7 +38,12 @@ export default function Edit( { attributes, setAttributes } ) {
     useEffect( () => {
         if ( selectedTaxonomy ) {
             if (parentTermId === -1) {
-                wp.apiFetch( { path: `/wp/v2/${ selectedTaxonomy }?slug=${window.location.pathname.split('/').pop()}` } ).then( ( data ) => {
+                const termId = contextTermId || window.location.pathname.split('/').pop();
+                let field = 'slug';
+                if (contextTermId) {
+                    field = 'parent';
+                }
+                wp.apiFetch( { path: `/wp/v2/${ selectedTaxonomy }?${ field }=${termId}` } ).then( ( data ) => {
                     setTerms( data );
                 } );
             } else {
@@ -47,7 +52,7 @@ export default function Edit( { attributes, setAttributes } ) {
                 } );
             }
         }
-    }, [ selectedTaxonomy, parentTermId ] );
+    }, [ selectedTaxonomy, parentTermId, contextTermId ] );
 
     const generateTermOptions = (terms, depth = 0) => {
         let options = [];
@@ -117,7 +122,23 @@ export default function Edit( { attributes, setAttributes } ) {
                             ...generateTermOptions(parentTerms)
                         ]}
                         onChange={(value) => {
+                            // if value is not equal to -1 - set contextTermId to 0
+                            if (value !== -1) {
+                                setAttributes({contextTermId: 0});
+                            }
+
                             setAttributes({parentTermId: parseInt(value, 10)});
+                        }}
+                    />
+                    <SelectControl
+                        label={__('Select a context term (Debugging)', 'taxonomy-list-block')}
+                        value={contextTermId}
+                        options={[
+                            { value: 0, label: __('None', 'taxonomy-list-block') },
+                            ...generateTermOptions(parentTerms)
+                        ]}
+                        onChange={(value) => {
+                            setAttributes({contextTermId: parseInt(value, 10)});
                         }}
                     />
                     <SelectControl
