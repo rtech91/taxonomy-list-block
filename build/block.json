@@ -28,6 +28,10 @@
     "imageFieldName": {
       "type": "string",
       "default": ""
+    },
+    "setAsBackground": {
+      "type": "boolean",
+      "default": false
     }
   },
   "supports": {

@@ -4,12 +4,14 @@
 	$includeLinks = $attributes['includeLinks'];
 	$includeImage = $attributes['includeImage'];
 	$imageFieldName = $attributes['imageFieldName'];
+	$setAsBackground = $attributes['setAsBackground'];
 
 	// Get terms of the selected taxonomy
 	$terms = get_terms( array(
 		'taxonomy' => $selectedTaxonomy,
 		'hide_empty' => false,
 	) );
+	$terms = array_reverse($terms);
 
     $content = '<div ' . get_block_wrapper_attributes() . '>';
 
@@ -24,14 +26,23 @@
 			if ($outputVariant === 'list') {
 				$content .= '<li>';
 			} else {
-				$content .= '<div class="flex-item">';
+				if($includeImage && $setAsBackground) {
+					$image = get_term_meta($term->term_id, $imageFieldName, true);
+					if ($image && is_numeric( $image)) {
+						$content .= '<div class="flex-item" style="background-image: url(' . wp_get_attachment_image_url($image, 'full') . '); background-size: cover;">';
+					} else if( $image && is_string( $image )) {
+						$content .= '<div class="flex-item" style="background-image: url(' . esc_url($image) . '); background-size: cover;">';
+					}
+				} else {
+					$content .= '<div class="flex-item">';
+				}
 			}
 
-			if ($includeImage) {
+			if ($includeImage && !$setAsBackground) {
 				$image = get_term_meta($term->term_id, $imageFieldName, true);
 				if ($image && is_numeric( $image)) {
-                    $content .= wp_get_attachment_image($image, 'thumbnail');
-				} else if( $image ) {
+                    $content .= wp_get_attachment_image($image, 'full');
+				} else if( $image && is_string( $image )) {
 					$content .= '<img src="' . esc_url($image) . '" alt="' . esc_attr($term->name) . '">';
 				}
 			}

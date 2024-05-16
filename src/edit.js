@@ -6,7 +6,7 @@ import { useEffect, useState } from '@wordpress/element';
 import './editor.scss';
 
 export default function Edit( { attributes, setAttributes } ) {
-    const { selectedTaxonomy, outputVariant, includeLinks, includeImage, imageFieldName } = attributes;
+    const { selectedTaxonomy, outputVariant, includeLinks, includeImage, imageFieldName, setAsBackground } = attributes;
     const { editPost } = useDispatch( 'core/editor' );
     const [ taxonomies, setTaxonomies ] = useState( [] );
     const [ terms, setTerms ] = useState( [] );
@@ -80,6 +80,13 @@ export default function Edit( { attributes, setAttributes } ) {
                             setAttributes({outputVariant: value});
                         }}
                     />
+                    <ToggleControl
+                        label={__('Include Links', 'taxonomy-list-block')}
+                        checked={includeLinks}
+                        onChange={(value) => {
+                            setAttributes({includeLinks: value});
+                        }}
+                    />
                     {outputVariant === 'flex' && (
                         <>
                             <ToggleControl
@@ -98,15 +105,17 @@ export default function Edit( { attributes, setAttributes } ) {
                                     }}
                                 />
                             )}
+                            {includeImage && (
+                                <ToggleControl
+                                    label={__('Set as background image', 'taxonomy-list-block')}
+                                    checked={setAsBackground}
+                                    onChange={(value) => {
+                                        setAttributes({setAsBackground: value});
+                                    }}
+                                />
+                            )}
                         </>
                     )}
-                    <ToggleControl
-                        label={__('Include Links', 'taxonomy-list-block')}
-                        checked={includeLinks}
-                        onChange={(value) => {
-                            setAttributes({includeLinks: value});
-                        }}
-                    />
                 </PanelBody>
             </InspectorControls>
             {renderTerms()}
