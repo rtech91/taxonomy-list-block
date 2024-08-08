@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { SelectControl, PanelBody, ToggleControl, TextControl } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import './editor.scss';
 
@@ -11,6 +11,7 @@ export default function Edit( { attributes, setAttributes } ) {
     const [ taxonomies, setTaxonomies ] = useState( [] );
     const [ terms, setTerms ] = useState( [] );
     const [ parentTerms, setParentTerms ] = useState( [] );
+    const [ isACFActive, setIsACFActive ] = useState( false );
 
     // Fetch taxonomies
     useEffect( () => {
@@ -19,11 +20,29 @@ export default function Edit( { attributes, setAttributes } ) {
         } );
     }, [] );
 
+    // Transform flat array to hierarchical
     const transformToHierarchical = (arr, parent = 0, tree = []) => {
         arr.filter(({ parent: id }) => id === parent)
             .forEach(({ id, ...rest }) => tree.push({ id, ...rest, children: transformToHierarchical(arr, id) }));
         return tree;
     };
+
+    // Check if ACF plugin is active
+    const isACFPluginActive = async function () {
+        /* @type {Promise<boolean>} */
+        const plugins = await wp.apiFetch({
+            path: '/wp/v2/plugins'
+        });
+
+        return plugins.some(plugin => plugin.plugin === 'advanced-custom-fields/acf' && plugin.status === 'active');
+    };
+
+    useEffect(() => {
+        isACFPluginActive().then((result) => {
+            setIsACFActive(result);
+        });
+    } , [ isACFActive ]);
+
 
     // Fetch terms when selectedTaxonomy changes
     useEffect( () => {
@@ -147,6 +166,12 @@ export default function Edit( { attributes, setAttributes } ) {
                         options={outputVariantOptions}
                         onChange={(value) => {
                             setAttributes({outputVariant: value});
+
+                            // re-check if ACF is active
+                            isACFPluginActive().then((result) => {
+                                setIsACFActive(result);
+                            });
+                            
                         }}
                     />
                     <ToggleControl
@@ -156,7 +181,7 @@ export default function Edit( { attributes, setAttributes } ) {
                             setAttributes({includeLinks: value});
                         }}
                     />
-                    {outputVariant === 'flex' && (
+                    {outputVariant === 'flex' && isACFActive && (
                         <>
                             <ToggleControl
                                 label={__('Include Image', 'taxonomy-list-block')}
