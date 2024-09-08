@@ -5,11 +5,78 @@
 	"version": "0.1.0",
 	"title": "Taxonomy List Block",
 	"category": "widgets",
-	"icon": "smiley",
+	"icon": "tag",
 	"description": "Example block scaffolded with Create Block tool.",
 	"example": {},
+    "attributes": {
+      "selectedTaxonomy": {
+        "type": "string",
+        "default": "category"
+      },
+      "parentTermId": {
+        "type": "number",
+        "default": 0
+      },
+      "contextTermId": {
+        "type": "number",
+        "default": 0
+      },
+      "outputVariant": {
+        "type": "string",
+        "default": "list"
+      },
+      "includeLinks": {
+        "type": "boolean",
+        "default": true
+      },
+      "includeImage": {
+        "type": "boolean",
+        "default": false
+      },
+      "imageFieldName": {
+        "type": "string",
+        "default": ""
+      },
+      "setAsBackground": {
+        "type": "boolean",
+        "default": false
+      }
+    },
 	"supports": {
-		"html": false
+		"html": false,
+        "color": {
+          "text": true,
+          "background": true,
+          "link": true
+        },
+        "spacing": {
+          "padding": true,
+          "margin": true,
+          "blockGap": ["horizontal", "vertical"]
+        },
+        "typography": {
+          "fontSize": true,
+          "lineHeight": true
+        },
+        "align": true,
+        "customClassName": true,
+        "anchor": true,
+        "inserter": true,
+        "reusable": true,
+        "alignWide": true,
+        "layout": {
+          "default": {
+            "type": "flex",
+            "justifyContent": "center"
+          },
+          "allowEditing": true,
+          "allowInheriting": true,
+          "allowSizingOnChildren": true,
+          "allowVerticalAlignment": true,
+          "allowJustification": true,
+          "allowOrientation": true,
+          "allowCustomContentAndWideSize": true
+        }
 	},
 	"textdomain": "taxonomy-list-block",
 	"editorScript": "file:./index.js",
